@@ -38,9 +38,13 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # Copy application code
 COPY --chown=appuser:appuser . .
 
+# Make startup script executable
+RUN chmod +x startup.py
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
+# Remove hardcoded credentials path - use default GCP auth
+# ENV GOOGLE_APPLICATION_CREDENTIALS=/app/credentials.json
 
 # Switch to non-root user
 USER appuser
@@ -51,11 +55,9 @@ ENV PORT=8000
 # Expose port (documentation only)
 EXPOSE 8000
 
-# Health check using the PORT variable
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/health || exit 1
+# Health check - removed as Cloud Run handles this
+# HEALTHCHECK is not needed for Cloud Run
 
-# Run the application
-# Use sh -c to properly expand the PORT variable
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run the application using the startup script
+CMD ["python3", "startup.py"]
 
