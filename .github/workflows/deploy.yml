@@ -1,0 +1,87 @@
+name: Deploy AI Service to GCP
+
+on:
+  push:
+    branches: [main]  # Only deploy from main branch
+  workflow_dispatch:    # Allow manual deployment
+
+env:
+  GCP_PROJECT: mychef-467404
+  GCP_REGION: us-central1
+  SERVICE_NAME: chefoodai-ai
+  ARTIFACT_REGISTRY: us-central1-docker.pkg.dev/mychef-467404/chefoodai
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production  # Optional: requires approval for production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.GCP_PROJECT }}
+      
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev
+      
+      - name: Build and Push Docker Image
+        run: |
+          VERSION="${{ github.sha }}"
+          
+          echo "🔨 Building AI Service Docker image..."
+          docker build -t ${{ env.ARTIFACT_REGISTRY }}/ai:${VERSION} \
+                      -t ${{ env.ARTIFACT_REGISTRY }}/ai:latest \
+                      .
+          
+          echo "📤 Pushing AI Service Docker image..."
+          docker push ${{ env.ARTIFACT_REGISTRY }}/ai:${VERSION}
+          docker push ${{ env.ARTIFACT_REGISTRY }}/ai:latest
+      
+      - name: Deploy to Cloud Run
+        run: |
+          echo "🚀 Deploying AI Service to Cloud Run..."
+          
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.ARTIFACT_REGISTRY }}/ai:${{ github.sha }} \
+            --region ${{ env.GCP_REGION }} \
+            --platform managed \
+            --allow-unauthenticated \
+            --min-instances 1 \
+            --max-instances 5 \
+            --cpu 4 \
+            --memory 2Gi \
+            --timeout 600 \
+            --set-env-vars "ENVIRONMENT=production" \
+            --set-env-vars "VERSION=${{ github.sha }}" \
+            --set-env-vars "GOOGLE_CLOUD_PROJECT=${{ env.GCP_PROJECT }}" \
+            --set-secrets "OPENAI_API_KEY=openai-api-key:latest" \
+            --set-secrets "VERTEX_AI_KEY=vertex-ai-key:latest" \
+            --set-secrets "REDIS_URL=redis-url:latest" \
+            --update-labels "service=ai,environment=production"
+      
+      - name: Verify Deployment
+        run: |
+          echo "✅ Verifying deployment..."
+          SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --region ${{ env.GCP_REGION }} \
+            --format 'value(status.url)')
+          
+          echo "🔗 Service URL: ${SERVICE_URL}"
+          echo "🏥 Running health check..."
+          
+          sleep 15  # AI service needs more time to initialize
+          curl -f ${SERVICE_URL}/health || exit 1
+          
+          echo "✅ AI Service deployed successfully!"
+          echo "📌 Version: ${{ github.sha }}"
+          echo "🔗 URL: ${SERVICE_URL}"
