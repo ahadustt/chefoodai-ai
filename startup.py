@@ -28,9 +28,8 @@ def start_server():
     
     try:
         # Import the app here to catch any import errors
-        # Use simplified main for now to debug Cloud Run deployment
-        from main_simple import app
-        logger.info("Successfully imported FastAPI app (simplified version)")
+        from main import app
+        logger.info("Successfully imported FastAPI app")
         
         # Configure uvicorn with minimal settings for reliability
         config = uvicorn.Config(
