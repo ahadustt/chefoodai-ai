@@ -15,13 +15,32 @@ import httpx
 from contextlib import asynccontextmanager
 
 # AI Service imports
-from ai.vertex_service import VertexAIService
-from ai.dalle_service import DalleService
-from ai.gemini_service import GeminiService
-from ai.nutrition_analyzer import NutritionAnalyzer
-from ai.meal_plan_optimizer import MealPlanOptimizer
-from ai.recipe_generator import RecipeGenerator
-from ai.shopping_optimizer import ShoppingOptimizer
+from ai.vertex_integration import VertexAIService
+# Optional imports - create stubs if modules don't exist
+try:
+    from ai.dalle_service import DalleService
+except ImportError:
+    DalleService = None
+try:
+    from ai.gemini_service import GeminiService
+except ImportError:
+    GeminiService = None
+try:
+    from ai.nutrition_analyzer import NutritionAnalyzer
+except ImportError:
+    NutritionAnalyzer = None
+try:
+    from ai.meal_plan_optimizer import MealPlanOptimizer
+except ImportError:
+    MealPlanOptimizer = None
+try:
+    from ai.recipe_generator import RecipeGenerator
+except ImportError:
+    RecipeGenerator = None
+try:
+    from ai.shopping_optimizer import ShoppingOptimizer
+except ImportError:
+    ShoppingOptimizer = None
 
 # Configure structured logging
 structlog.configure(
@@ -60,14 +79,29 @@ async def lifespan(app: FastAPI):
     try:
         # Initialize AI services
         vertex_ai = VertexAIService()
-        dalle_service = DalleService()
-        gemini_service = GeminiService()
-        nutrition_analyzer = NutritionAnalyzer()
-        meal_plan_optimizer = MealPlanOptimizer()
-        recipe_generator = RecipeGenerator()
-        shopping_optimizer = ShoppingOptimizer()
+        logger.info("Vertex AI service initialized")
         
-        logger.info("AI services initialized successfully")
+        # Initialize optional services if available
+        if DalleService:
+            dalle_service = DalleService()
+            logger.info("DALL-E service initialized")
+        if GeminiService:
+            gemini_service = GeminiService()
+            logger.info("Gemini service initialized")
+        if NutritionAnalyzer:
+            nutrition_analyzer = NutritionAnalyzer()
+            logger.info("Nutrition analyzer initialized")
+        if MealPlanOptimizer:
+            meal_plan_optimizer = MealPlanOptimizer()
+            logger.info("Meal plan optimizer initialized")
+        if RecipeGenerator:
+            recipe_generator = RecipeGenerator()
+            logger.info("Recipe generator initialized")
+        if ShoppingOptimizer:
+            shopping_optimizer = ShoppingOptimizer()
+            logger.info("Shopping optimizer initialized")
+        
+        logger.info("AI services initialization complete")
     except Exception as e:
         logger.error(f"Failed to initialize AI services: {e}")
     
