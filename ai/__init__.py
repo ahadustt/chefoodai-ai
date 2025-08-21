@@ -16,13 +16,13 @@ from .vertex_integration import VertexAIService, RecipeRequest, ModelVersion
 logger = logging.getLogger(__name__)
 
 # Optional imports - only import if needed
-def get_aioredis():
-    """Conditionally import aioredis"""
+def get_redis_async():
+    """Conditionally import redis async client"""
     try:
-        import aioredis
-        return aioredis
+        from redis import asyncio as redis_async
+        return redis_async
     except ImportError:
-        logger.warning("aioredis not available - caching disabled")
+        logger.warning("redis async not available - caching disabled")
         return None
 
 def get_cost_optimizer():

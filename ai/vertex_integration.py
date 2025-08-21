@@ -15,11 +15,11 @@ import vertexai
 
 # Optional imports for caching
 try:
-    import aioredis
-    AIOREDIS_AVAILABLE = True
+    from redis import asyncio as redis_async
+    REDIS_ASYNC_AVAILABLE = True
 except ImportError:
-    aioredis = None
-    AIOREDIS_AVAILABLE = False
+    redis_async = None
+    REDIS_ASYNC_AVAILABLE = False
 import uuid
 from vertexai.generative_models import (
     GenerativeModel,

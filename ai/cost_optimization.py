@@ -12,9 +12,9 @@ from enum import Enum
 import logging
 from dataclasses import dataclass
 try:
-    import aioredis
+    from redis import asyncio as redis_async
 except ImportError:
-    aioredis = None
+    redis_async = None
 from collections import defaultdict
 import statistics
 
