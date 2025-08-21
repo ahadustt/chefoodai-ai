@@ -8,7 +8,7 @@ on:
 env:
   GCP_PROJECT: mychef-467404
   GCP_REGION: us-central1
-  SERVICE_NAME: chefoodai-ai
+  SERVICE_NAME: chefoodai-ai-service
   ARTIFACT_REGISTRY: us-central1-docker.pkg.dev/mychef-467404/chefoodai
 
 jobs:
