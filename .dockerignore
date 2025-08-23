@@ -1,0 +1,115 @@
+# Git and version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# IDE and editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+docs/
+*.md
+!requirements.txt
+
+# Testing
+tests/
+test_*
+*_test.py
+.pytest_cache
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+.travis.yml
+.circleci/
+
+# Docker
+Dockerfile*
+.dockerignore
+docker-compose*.yml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment files (keep .env template)
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+tmp/
+temp/
+.tmp
+
+# Local development
+local/
+dev/
+development/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Cache directories
+.cache/
+node_modules/
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Large files that shouldn't be in container
+*.csv
+*.xlsx
+*.zip
+*.tar.gz
+*.sql
+
+# Security sensitive files
+*.pem
+*.key
+*.crt
+credentials.json
+service-account.json
